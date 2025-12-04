@@ -43,13 +43,53 @@ fn get_any_zero_clicks(reader: BufReader<File>) -> std::io::Result<i32> {
     Ok(total_zeros)
 }
 
+fn brute_force_any_zero_clicks(reader: BufReader<File>) -> std::io::Result<i32> {
+    let mut current_position = 50;
+    let mut total_zero_clicks = 0;
+
+    for line in reader.lines() {
+        let line = line?;
+        if line.len() < 2 {
+            continue;
+        };
+
+        let (direction, distance) = line.split_at(1);
+        let distance: i32 = distance.parse().unwrap();
+
+        // iterate through the distance, either adding to the current_position if direction is right
+        // or subtracting if left
+        for _ in 0..distance {
+            if direction == "R" {
+                current_position += 1
+            };
+            if direction == "L" {
+                current_position -= 1
+};
+
+            // manual wrap around
+            if current_position == DIAL_SIZE {
+                current_position = 0
+            };
+            if current_position == -1 {
+                current_position = DIAL_SIZE - 1
+};
+
+            if current_position == 0 {
+                total_zero_clicks += 1
+            };
+        }
+    }
+
+    Ok(total_zero_clicks)
+}
+
 fn main() -> std::io::Result<()> {
     let file = File::open("./day_1_input.txt")?;
     // let file = File::open("./test_input.txt")?;
     // let file = File::open("./test_input_2.txt")?;
     let reader = BufReader::new(file);
 
-    if let Ok(total_zero_clicks) = get_any_zero_clicks(reader) {
+    if let Ok(total_zero_clicks) = brute_force_any_zero_clicks(reader) {
         println!("{total_zero_clicks}");
     }
 
