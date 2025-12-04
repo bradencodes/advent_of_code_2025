@@ -5,45 +5,7 @@ use std::{
 
 const DIAL_SIZE: i32 = 100;
 
-fn get_any_zero_clicks(reader: BufReader<File>) -> std::io::Result<i32> {
-    let mut current_position = 50;
-    let mut total_zeros = 0;
-
-    for line in reader.lines() {
-        let line = line?;
-        if line.len() < 2 {
-            continue;
-        };
-
-        let (direction, distance) = line.split_at(1);
-        let distance: i32 = distance.parse().unwrap();
-
-        let new_magnitude = match direction {
-            "R" => current_position + distance,
-            "L" => current_position - distance,
-            _ => continue,
-        };
-
-        total_zeros += {
-            if new_magnitude == 0 {
-                1
-            } else {
-                (new_magnitude as f64 / DIAL_SIZE as f64).floor().abs() as i32
-            }
-        };
-
-        // remove duplicate count in case where dial is at 0 and is turned left
-        if current_position == 0 && new_magnitude < 0 {
-            total_zeros -= 1
-        };
-
-        current_position = new_magnitude.rem_euclid(DIAL_SIZE);
-    }
-
-    Ok(total_zeros)
-}
-
-fn brute_force_any_zero_clicks(reader: BufReader<File>) -> std::io::Result<i32> {
+fn new_get_any_zero_clicks(reader: BufReader<File>) -> std::io::Result<i32> {
     let mut current_position = 50;
     let mut total_zero_clicks = 0;
 
@@ -56,28 +18,20 @@ fn brute_force_any_zero_clicks(reader: BufReader<File>) -> std::io::Result<i32> 
         let (direction, distance) = line.split_at(1);
         let distance: i32 = distance.parse().unwrap();
 
-        // iterate through the distance, either adding to the current_position if direction is right
-        // or subtracting if left
-        for _ in 0..distance {
-            if direction == "R" {
-                current_position += 1
-            };
-            if direction == "L" {
-                current_position -= 1
-};
+        let full_rotations = distance / DIAL_SIZE;
+        total_zero_clicks += full_rotations;
 
-            // manual wrap around
-            if current_position == DIAL_SIZE {
-                current_position = 0
-            };
-            if current_position == -1 {
-                current_position = DIAL_SIZE - 1
-};
+        let partial_rotation_distance = distance % DIAL_SIZE;
+        let next_position = match direction {
+            "R" => current_position + partial_rotation_distance,
+            "L" => current_position - partial_rotation_distance,
+            _ => continue,
+        };
+        if current_position != 0 && (next_position < 1 || next_position > 99) {
+            total_zero_clicks += 1
+        };
 
-            if current_position == 0 {
-                total_zero_clicks += 1
-            };
-        }
+        current_position = next_position.rem_euclid(DIAL_SIZE);
     }
 
     Ok(total_zero_clicks)
@@ -85,11 +39,9 @@ fn brute_force_any_zero_clicks(reader: BufReader<File>) -> std::io::Result<i32> 
 
 fn main() -> std::io::Result<()> {
     let file = File::open("./day_1_input.txt")?;
-    // let file = File::open("./test_input.txt")?;
-    // let file = File::open("./test_input_2.txt")?;
     let reader = BufReader::new(file);
 
-    if let Ok(total_zero_clicks) = brute_force_any_zero_clicks(reader) {
+    if let Ok(total_zero_clicks) = new_get_any_zero_clicks(reader) {
         println!("{total_zero_clicks}");
     }
 
