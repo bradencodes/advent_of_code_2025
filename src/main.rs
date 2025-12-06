@@ -1,6 +1,7 @@
-use advent_of_code_2025::day_1;
+use advent_of_code_2025::day_2;
 
 fn main() {
-    let day_1_solution = day_1::solve();
-    println!("day 1 solution: {day_1_solution}");
+    let input = include_str!("./day_2/input.txt");
+    let day_2_solution = day_2::solve(input);
+    println!("day 1 solution: {day_2_solution}");
 }
