@@ -1,6 +1,4 @@
-fn find_largest_joltage_errant(bank: &str) -> u32 {
-    // initialize the largest_first_num and largest_second_num to the second to last
-    // and last digits in the bank, respectively.
+fn find_largest_joltage(bank: &str) -> u32 {
     let mut largest_first_num: u32 = 0;
     let mut largest_second_num: u32 = 0;
 
@@ -16,37 +14,14 @@ fn find_largest_joltage_errant(bank: &str) -> u32 {
             continue;
         }
 
-        // If the digit is larger than the largest_first_num, set largest_second_num to MAX(largest_first_num, largest_second_num), and set largest_first_num to the current digit
-        if digit > largest_first_num {
+        // If the digit is larger than or equal to the largest_first_num, set largest_second_num to MAX(largest_first_num, largest_second_num), and set largest_first_num to the current digit
+        if digit >= largest_first_num {
             largest_second_num = largest_first_num.max(largest_second_num);
             largest_first_num = digit;
         }
     }
 
     // return the number made from the largest_first_num and largest_second_num
-    let largest_joltage = largest_first_num * 10 + largest_second_num;
-    largest_joltage
-}
-
-fn find_largest_joltage(bank: &str) -> u32 {
-    let mut largest_first_num = 0;
-    let mut largest_first_num_index = 0;
-    for (i, char) in bank.split_at(bank.len() - 1).0.chars().rev().enumerate() {
-        let digit = char.to_digit(10).unwrap();
-        if digit >= largest_first_num {
-            largest_first_num = digit;
-            largest_first_num_index = bank.len() - i - 2;
-        }
-    }
-
-    let mut largest_second_num = 0;
-    for char in bank.split_at(largest_first_num_index + 1).1.chars() {
-        let digit = char.to_digit(10).unwrap();
-        if digit > largest_second_num {
-            largest_second_num = digit
-        };
-    }
-
     let largest_joltage = largest_first_num * 10 + largest_second_num;
     largest_joltage
 }
