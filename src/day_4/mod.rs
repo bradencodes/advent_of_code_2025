@@ -63,17 +63,46 @@ fn check_if_roll_is_accessible(diagrid: &[Vec<char>], grid_index: GridIndex) -> 
     adjacent_roll_count < ACCESS_LIMIT
 }
 
+fn create_diagrid(input: &str) -> Vec<Vec<char>> {
+    input
+        .split('\n')
+        .filter(|row| !row.is_empty())
+        .map(|row| row.chars().collect())
+        .collect()
+}
+
+fn count_accessible_rolls(input: &str) -> u32 {
+    let diagrid = create_diagrid(input);
+    let mut accessible_row_count = 0;
+
+    for row_index in 0..diagrid.len() {
+        for column_index in 0..diagrid[0].len() {
+            if diagrid[row_index][column_index] == ROLL {
+                let is_roll_accessible =
+                    check_if_roll_is_accessible(&diagrid, (row_index, column_index));
+
+                if is_roll_accessible {
+                    accessible_row_count += 1
+                };
+            }
+        }
+    }
+
+    accessible_row_count
+}
+
+pub fn solve_part_1(input: &str) -> u32 {
+    count_accessible_rolls(input)
+}
+
 #[cfg(test)]
 mod part_1_tests {
     use super::*;
 
     #[test]
     fn check_if_roll_is_accessible_works() {
-        let diagram_string = "....\n.@@@\n.@@@\n.@@@\n....";
-        let diagrid: Vec<Vec<char>> = diagram_string
-            .split('\n')
-            .map(|row| row.chars().collect())
-            .collect();
+        let input = "....\n.@@@\n.@@@\n.@@@\n....\n";
+        let diagrid = create_diagrid(input);
 
         // ....\n
         // .@@@\n
@@ -90,5 +119,11 @@ mod part_1_tests {
         assert_eq!(check_if_roll_is_accessible(&diagrid, (3, 1)), true);
         assert_eq!(check_if_roll_is_accessible(&diagrid, (3, 2)), false);
         assert_eq!(check_if_roll_is_accessible(&diagrid, (3, 3)), true);
+    }
+
+    #[test]
+    fn count_accessible_rolls_works() {
+        let input = include_str!("./test_input.txt");
+        assert_eq!(count_accessible_rolls(input), 13);
     }
 }
