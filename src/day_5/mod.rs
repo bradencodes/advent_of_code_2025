@@ -21,7 +21,91 @@ fn combine_ranges(ranges: &Vec<FreshRange>) -> Vec<FreshRange> {
     // 3. Insert the current range into the appropriate spot by replacing the first
     // overlapping range. Then remove the rest of the overlapping ranges.
 
-    ranges.to_vec()
+    for range in ranges {
+        let mut current_range = range.clone();
+
+        if combined_ranges.is_empty() {
+            combined_ranges.push(current_range);
+            continue;
+        }
+
+        // Find the closest range that ends before the current range starts
+        // TODO: optimize with binary search
+        let before_idx = combined_ranges
+            .iter()
+            .rposition(|r| r.end < current_range.start);
+
+        // Find the closest range that starts after the current range ends
+        // TODO: optimize with binary search
+        let after_idx = combined_ranges
+            .iter()
+            .position(|r| r.start > current_range.end);
+
+        // Determine the overlapping range indices
+        let (first_overlap_idx, last_overlap_idx) = match (before_idx, after_idx) {
+            (Some(before), Some(after)) => {
+                if before + 1 >= after {
+                    // No overlapping ranges
+                    (None, None)
+                } else {
+                    (Some(before + 1), Some(after - 1))
+                }
+            }
+            (Some(before), None) => {
+                if before + 1 < combined_ranges.len() {
+                    (Some(before + 1), Some(combined_ranges.len() - 1))
+                } else {
+                    (None, None)
+                }
+            }
+            (None, Some(after)) => {
+                if after > 0 {
+                    (Some(0), Some(after - 1))
+                } else {
+                    (None, None)
+                }
+            }
+            (None, None) => (Some(0), Some(combined_ranges.len() - 1)),
+        };
+
+        // If there are overlapping ranges, extend the current range
+        if let (Some(first), Some(last)) = (first_overlap_idx, last_overlap_idx) {
+            // TODO: optimize by directly using first_overlap.start
+            let min_start = combined_ranges[first..=last]
+                .iter()
+                .map(|r| r.start)
+                .min()
+                .unwrap()
+                .min(current_range.start);
+
+            // TODO: optimize by directly using last_overlap.end
+            let max_end = combined_ranges[first..=last]
+                .iter()
+                .map(|r| r.end)
+                .max()
+                .unwrap()
+                .max(current_range.end);
+
+            current_range = FreshRange {
+                start: min_start,
+                end: max_end,
+            };
+
+            // Replace the first overlapping range with the extended range
+            combined_ranges[first] = current_range;
+
+            // Remove the rest of the overlapping ranges
+            if last > first {
+                combined_ranges.drain(first + 1..=last);
+            }
+        } else {
+            // No overlapping ranges, insert at the appropriate position
+            let insert_pos = before_idx.map(|i| i + 1).unwrap_or(0);
+            combined_ranges.insert(insert_pos, current_range);
+        }
+    }
+
+    combined_ranges
 }
 
 fn count_fresh_ingredients(input: &str) -> u32 {
