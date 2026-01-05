@@ -70,21 +70,9 @@ fn combine_ranges(ranges: &Vec<FreshRange>) -> Vec<FreshRange> {
 
         // If there are overlapping ranges, extend the current range
         if let (Some(first), Some(last)) = (first_overlap_idx, last_overlap_idx) {
-            // TODO: optimize by directly using first_overlap.start
-            let min_start = combined_ranges[first..=last]
-                .iter()
-                .map(|r| r.start)
-                .min()
-                .unwrap()
-                .min(current_range.start);
+            let min_start = combined_ranges[first].start.min(current_range.start);
 
-            // TODO: optimize by directly using last_overlap.end
-            let max_end = combined_ranges[first..=last]
-                .iter()
-                .map(|r| r.end)
-                .max()
-                .unwrap()
-                .max(current_range.end);
+            let max_end = combined_ranges[last].end.max(current_range.end);
 
             current_range = FreshRange {
                 start: min_start,
