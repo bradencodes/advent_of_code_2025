@@ -30,16 +30,29 @@ fn combine_ranges(ranges: &Vec<FreshRange>) -> Vec<FreshRange> {
         }
 
         // Find the closest range that ends before the current range starts
-        // TODO: optimize with binary search
+        // Using binary search to find the rightmost range where r.end < current_range.start
         let before_idx = combined_ranges
-            .iter()
-            .rposition(|r| r.end < current_range.start);
+            .binary_search_by(|r| {
+                if r.end < current_range.start {
+                    std::cmp::Ordering::Less
+                } else {
+                    std::cmp::Ordering::Greater
+                }
+            })
+            .err()
+            .and_then(|idx| if idx > 0 { Some(idx - 1) } else { None });
 
         // Find the closest range that starts after the current range ends
-        // TODO: optimize with binary search
+        // Using binary search to find the leftmost range where r.start > current_range.end
         let after_idx = combined_ranges
-            .iter()
-            .position(|r| r.start > current_range.end);
+            .binary_search_by(|r| {
+                if r.start > current_range.end {
+                    std::cmp::Ordering::Greater
+                } else {
+                    std::cmp::Ordering::Less
+                }
+            })
+            .err();
 
         // Determine the overlapping range indices
         let (first_overlap_idx, last_overlap_idx) = match (before_idx, after_idx) {
