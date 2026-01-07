@@ -29,30 +29,53 @@ fn combine_ranges(ranges: &Vec<FreshRange>) -> Vec<FreshRange> {
             continue;
         }
 
-        // Find the closest range that ends before the current range starts
-        // Using binary search to find the rightmost range where r.end < current_range.start
-        let before_idx = combined_ranges
-            .binary_search_by(|r| {
-                if r.end < current_range.start {
-                    std::cmp::Ordering::Less
-                } else {
-                    std::cmp::Ordering::Greater
-                }
-            })
-            .err()
-            .and_then(|idx| if idx > 0 { Some(idx - 1) } else { None });
+        // Find the rightmost range where r.end < current_range.start
+        // This is the last range that ends before the current range starts
+        let before_idx = {
+            let mut left = 0;
+            let mut right = combined_ranges.len();
+            let mut result = None;
 
-        // Find the closest range that starts after the current range ends
-        // Using binary search to find the leftmost range where r.start > current_range.end
-        let after_idx = combined_ranges
-            .binary_search_by(|r| {
-                if r.start > current_range.end {
-                    std::cmp::Ordering::Greater
+            while left < right {
+                let mid = left + (right - left) / 2;
+
+                if combined_ranges[mid].end < current_range.start {
+                    // This range ends before current starts, so it's a candidate
+                    result = Some(mid);
+                    // Look for a later range that also satisfies the condition
+                    left = mid + 1;
                 } else {
-                    std::cmp::Ordering::Less
+                    // This range doesn't end before current starts
+                    right = mid;
                 }
-            })
-            .err();
+            }
+
+            result
+        };
+
+        // Find the leftmost range where r.start > current_range.end
+        // This is the first range that starts after the current range ends
+        let after_idx = {
+            let mut left = 0;
+            let mut right = combined_ranges.len();
+            let mut result = None;
+
+            while left < right {
+                let mid = left + (right - left) / 2;
+
+                if combined_ranges[mid].start > current_range.end {
+                    // This range starts after current ends, so it's a candidate
+                    result = Some(mid);
+                    // Look for an earlier range that also satisfies the condition
+                    right = mid;
+                } else {
+                    // This range doesn't start after current ends
+                    left = mid + 1;
+                }
+            }
+
+            result
+        };
 
         // Determine the overlapping range indices
         let (first_overlap_idx, last_overlap_idx) = match (before_idx, after_idx) {
