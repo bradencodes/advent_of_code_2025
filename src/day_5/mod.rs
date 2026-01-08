@@ -1,9 +1,7 @@
-use std::ops::RangeInclusive;
-
 #[derive(Debug, PartialEq, Clone)]
 struct FreshRange {
-    start: u32,
-    end: u32,
+    start: u64,
+    end: u64,
 }
 
 /// Combines and sorts an array of fresh ranges. When fresh ranges overlap, they are
@@ -132,44 +130,64 @@ fn combine_ranges(ranges: &Vec<FreshRange>) -> Vec<FreshRange> {
     combined_ranges
 }
 
-fn count_fresh_ingredients(input: &str) -> u32 {
-    let (fresh_ranges, ingredients) = {
-        let split_input: Vec<&str> = input.split("\n\n").collect();
-        let separate_fresh_ranges: Vec<FreshRange> = {
-            split_input[0]
-                .split('\n')
-                .filter(|line| !line.is_empty())
-                .map(|range| {
-                    let split_range: Vec<&str> = range.split('-').collect();
-                    let start = split_range[0].parse().unwrap();
-                    let end = split_range[1].parse().unwrap();
-                    FreshRange { start, end }
-                })
-                .collect()
-        };
-
-        let fresh_ranges = combine_ranges(&separate_fresh_ranges);
-
-        let ingredients: Vec<u32> = split_input[1]
+fn parse_fresh_ranges_and_ingredients(input: &str) -> (Vec<FreshRange>, Vec<u64>) {
+    let split_input: Vec<&str> = input.split("\n\n").collect();
+    let separate_fresh_ranges = {
+        split_input[0]
             .split('\n')
             .filter(|line| !line.is_empty())
-            .map(|id| id.parse().unwrap())
-            .collect();
-
-        (fresh_ranges, ingredients)
+            .map(|range| {
+                let split_range: Vec<&str> = range.split('-').collect();
+                let start = split_range[0].parse().unwrap();
+                let end = split_range[1].parse().unwrap();
+                FreshRange { start, end }
+            })
+            .collect()
     };
 
-    let fresh_ingredient_count = ingredients
-        .iter()
-        .filter(|&ingredient| {
-            // TODO: Optimize by using binary search in the sorted fresh_ranges vector
-            fresh_ranges
-                .iter()
-                .any(|range| *ingredient >= range.start && *ingredient <= range.end)
-        })
-        .count() as u32;
+    let fresh_ranges = combine_ranges(&separate_fresh_ranges);
+
+    let ingredients = split_input[1]
+        .split('\n')
+        .filter(|line| !line.is_empty())
+        .map(|id| id.parse().unwrap())
+        .collect();
+
+    (fresh_ranges, ingredients)
+}
+
+fn count_fresh_ingredients(input: &str) -> u32 {
+    let (fresh_ranges, ingredients) = parse_fresh_ranges_and_ingredients(input);
+
+    let fresh_ingredient_count = {
+        let mut count = 0;
+
+        for ingredient in ingredients {
+            let is_ingredient_fresh = fresh_ranges
+                .binary_search_by(|range| {
+                    if range.start <= ingredient && range.end >= ingredient {
+                        std::cmp::Ordering::Equal
+                    } else if range.start > ingredient {
+                        std::cmp::Ordering::Greater
+                    } else {
+                        std::cmp::Ordering::Less
+                    }
+                })
+                .is_ok();
+
+            if is_ingredient_fresh {
+                count += 1;
+            };
+        }
+
+        count
+    };
 
     fresh_ingredient_count
+}
+
+pub fn solve_part_1(input: &str) -> u32 {
+    count_fresh_ingredients(input)
 }
 
 #[cfg(test)]
@@ -245,5 +263,32 @@ mod part_1_tests {
                 expected_combined_ranges
             );
         }
+    }
+}
+
+fn count_ingredient_ids_considered_fresh(input: &str) -> u64 {
+    let (fresh_ranges, _) = parse_fresh_ranges_and_ingredients(input);
+
+    let mut ingredient_ids_considered_fresh_count = 0;
+    for range in fresh_ranges {
+        let ingredient_ids_considered_fresh_in_range = range.end - range.start + 1;
+        ingredient_ids_considered_fresh_count += ingredient_ids_considered_fresh_in_range;
+    }
+
+    ingredient_ids_considered_fresh_count
+}
+
+pub fn solve_part_2(input: &str) -> u64 {
+    count_ingredient_ids_considered_fresh(input)
+}
+
+#[cfg(test)]
+mod part_2_tests {
+    use super::*;
+
+    #[test]
+    fn count_ingredient_ids_considered_fresh_works() {
+        let input = include_str!("./test_input.txt");
+        assert_eq!(count_ingredient_ids_considered_fresh(input), 14);
     }
 }
