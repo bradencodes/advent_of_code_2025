@@ -133,8 +133,6 @@ fn combine_ranges(ranges: &Vec<FreshRange>) -> Vec<FreshRange> {
 }
 
 fn count_fresh_ingredients(input: &str) -> u32 {
-    let fresh_ingredient_count = 0;
-
     let (fresh_ranges, ingredients) = {
         let split_input: Vec<&str> = input.split("\n\n").collect();
         let separate_fresh_ranges: Vec<FreshRange> = {
@@ -161,7 +159,15 @@ fn count_fresh_ingredients(input: &str) -> u32 {
         (fresh_ranges, ingredients)
     };
 
-    dbg!();
+    let fresh_ingredient_count = ingredients
+        .iter()
+        .filter(|&ingredient| {
+            // TODO: Optimize by using binary search in the sorted fresh_ranges vector
+            fresh_ranges
+                .iter()
+                .any(|range| *ingredient >= range.start && *ingredient <= range.end)
+        })
+        .count() as u32;
 
     fresh_ingredient_count
 }
