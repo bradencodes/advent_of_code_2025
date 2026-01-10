@@ -1,6 +1,27 @@
 pub mod part_1 {
+    enum Operator {
+        Add,
+        Multiply,
+    }
+
+    struct Problem {
+        numbers: Vec<u64>,
+        operator: Operator,
+    }
+
     fn calculate_grand_total(input: &str) -> u64 {
-        let grand_total = 0;
+        let results = {
+            let problem_grid: Vec<Vec<&str>> = input
+                .split("\n")
+                .filter(|string| !string.is_empty())
+                .map(|line| line.split_whitespace().collect())
+                .collect();
+
+            // TODO: Iterate through columns of problem_grid backwards from the end to
+            // get operator and perform operation on numbers in problem.
+        };
+
+        let grand_total = results.iter().sum();
 
         grand_total
     }
