@@ -119,16 +119,28 @@ pub mod part_2 {
                 if grid_char.is_numeric() {
                     current_number.push(grid_char);
                 }
-                let is_end_of_column = column_index == grid_column_length;
+                let is_end_of_column = column_index == grid_column_length - 1;
                 if is_end_of_column {
-                    let is_end_of_problem = current_number.is_empty();
+                    let is_last_problem = row_index == grid_row_length - 1;
+                    let is_end_of_problem = current_number.is_empty() || is_last_problem;
                     if is_end_of_problem {
+                        if is_last_problem {
+                            let final_number: u64 = current_number.parse().unwrap();
+                            match current_operation {
+                                Operator::Add => current_total += final_number,
+                                Operator::Multiply => current_total *= final_number,
+                            };
+                        }
+
                         grand_total += current_total;
-                        current_operation = operators_iter.next().unwrap();
-                        current_total = match current_operation {
-                            Operator::Add => 0,
-                            Operator::Multiply => 1,
-                        };
+
+                        if !is_last_problem {
+                            current_operation = operators_iter.next().unwrap();
+                            current_total = match current_operation {
+                                Operator::Add => 0,
+                                Operator::Multiply => 1,
+                            };
+                        }
                     } else {
                         let final_number: u64 = current_number.parse().unwrap();
                         match current_operation {
