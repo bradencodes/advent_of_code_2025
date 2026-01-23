@@ -96,6 +96,10 @@ pub mod part_2 {
         timelines_count
     }
 
+    pub fn solve(input: &str) -> u64 {
+        count_timelines(input)
+    }
+
     #[cfg(test)]
     mod tests {
         use super::*;
