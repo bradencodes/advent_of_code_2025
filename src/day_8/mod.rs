@@ -1,4 +1,4 @@
-mod part_1 {
+pub mod part_1 {
     type Coordinate = u64;
     type X = Coordinate;
     type Y = Coordinate;
@@ -12,7 +12,7 @@ mod part_1 {
         distance: Distance,
     }
     type Circuit<'a> = Vec<&'a JunctionBox>;
-    type Circuits<'a> = Vec<Vec<&'a JunctionBox>>;
+    type Circuits<'a> = Vec<Circuit<'a>>;
 
     fn to_f64_tuple(loc: &JunctionBox) -> (f64, f64, f64) {
         (loc.0 as f64, loc.1 as f64, loc.2 as f64)
@@ -138,6 +138,10 @@ mod part_1 {
         }
 
         sizes as u64
+    }
+
+    pub fn solve(input: &str) -> u64 {
+        find_sizes_of_3_largest_circuits_from_n_connections(input, 1000)
     }
 
     #[cfg(test)]
