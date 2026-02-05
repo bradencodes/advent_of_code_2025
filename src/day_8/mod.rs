@@ -170,14 +170,26 @@ pub mod part_1 {
 }
 
 pub mod part_2 {
+    use std::u64::MAX;
+
     use super::*;
 
     fn find_distance_for_single_circuit(input: &str) -> u64 {
-        let mut distance_of_junction_boxes_that_form_single_circuit = 0;
-
         let junction_boxes = parse_junction_boxes(input);
+        let sorted_box_pair_distances = create_sorted_box_pair_distances(&junction_boxes);
+        let mut circuits = init_circuits(&junction_boxes);
 
-        distance_of_junction_boxes_that_form_single_circuit
+        for PairDistance { pair, .. } in sorted_box_pair_distances {
+            connect(pair.0, pair.1, &mut circuits);
+
+            let is_single_circuit = circuits.len() == 1;
+            if is_single_circuit {
+                let distance_of_junction_boxes_that_form_single_circuit = pair.0.0 * pair.1.0;
+                return distance_of_junction_boxes_that_form_single_circuit;
+            }
+        }
+
+        return MAX;
     }
 
     #[cfg(test)]
