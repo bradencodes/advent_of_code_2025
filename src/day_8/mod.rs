@@ -192,6 +192,10 @@ pub mod part_2 {
         return MAX;
     }
 
+    pub fn solve(input: &str) -> u64 {
+        find_distance_for_single_circuit(input)
+    }
+
     #[cfg(test)]
     mod tests {
         use super::*;
