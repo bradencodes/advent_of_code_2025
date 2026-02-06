@@ -1,5 +1,5 @@
 pub mod part_1 {
-    type Coordinate = u64;
+    type Coordinate = i64;
     type X = Coordinate;
     type Y = Coordinate;
     type RedTile = (X, Y);
@@ -25,14 +25,8 @@ pub mod part_1 {
 
     /// Cross product of vectors (o -> a) and (o -> b).
     /// Positive = counter-clockwise, negative = clockwise, zero = collinear.
-    fn cross(o: &RedTile, a: &RedTile, b: &RedTile) -> i128 {
-        let ox = o.0 as i128;
-        let oy = o.1 as i128;
-        let ax = a.0 as i128;
-        let ay = a.1 as i128;
-        let bx = b.0 as i128;
-        let by = b.1 as i128;
-        (ax - ox) * (by - oy) - (ay - oy) * (bx - ox)
+    fn cross(o: &RedTile, a: &RedTile, b: &RedTile) -> i64 {
+        (a.0 - o.0) * (b.1 - o.1) - (a.1 - o.1) * (b.0 - o.0)
     }
 
     /// Find the [convex hull](https://www.geeksforgeeks.org/dsa/convex-hull-using-graham-scan/) of the red tile points.
@@ -64,10 +58,8 @@ pub mod part_1 {
             let c = cross(pivot, a, b);
             if c == 0 {
                 // Collinear — sort by distance from pivot.
-                let dist_a =
-                    (a.0 as i128 - pivot.0 as i128).pow(2) + (a.1 as i128 - pivot.1 as i128).pow(2);
-                let dist_b =
-                    (b.0 as i128 - pivot.0 as i128).pow(2) + (b.1 as i128 - pivot.1 as i128).pow(2);
+                let dist_a = (a.0 - pivot.0).pow(2) + (a.1 - pivot.1).pow(2);
+                let dist_b = (b.0 - pivot.0).pow(2) + (b.1 - pivot.1).pow(2);
                 dist_a.cmp(&dist_b)
             } else if c > 0 {
                 std::cmp::Ordering::Less
