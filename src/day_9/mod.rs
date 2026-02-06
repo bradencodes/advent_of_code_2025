@@ -81,11 +81,26 @@ pub mod part_1 {
     }
 
     /// Find the largest area made using two red tiles as opposite corners.
-    fn find_largest_area(red_tiles: &RedTileReferences) -> u64 {
-        todo!()
+    fn find_largest_area(red_tiles: &RedTileReferences) -> i64 {
+        let mut largest_area = 0;
+        // iterate through each pair of red tiles
+        for (index, &tile_1) in red_tiles.iter().enumerate() {
+            for &tile_2 in red_tiles[(index + 1)..].iter() {
+                let area = {
+                    let x_size = (tile_1.0 - tile_2.0 + 1).abs();
+                    let y_size = (tile_1.1 - tile_2.1 + 1).abs();
+                    x_size * y_size
+                };
+                if area > largest_area {
+                    largest_area = area
+                };
+            }
+        }
+
+        largest_area
     }
 
-    fn find_largest_area_from_raw_input(input: &str) -> u64 {
+    fn find_largest_area_from_raw_input(input: &str) -> i64 {
         let red_tiles = parse_tiles(input);
         let outermost_red_tiles = find_outermost_red_tiles(&red_tiles);
         let largest_area = find_largest_area(&outermost_red_tiles);
@@ -97,7 +112,7 @@ pub mod part_1 {
         use super::*;
 
         #[test]
-        fn find_largest_area_works() {
+        fn find_largest_area_from_raw_input_works() {
             let input = include_str!("./test_input.txt");
             assert_eq!(find_largest_area_from_raw_input(input), 50);
         }

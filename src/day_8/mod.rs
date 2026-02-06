@@ -52,7 +52,7 @@ fn create_sorted_box_pair_distances<'a>(
         let mut vector = Vec::new();
 
         for (index, box_1) in junction_boxes.iter().enumerate() {
-            for box_2 in junction_boxes[index + 1..].iter() {
+            for box_2 in junction_boxes[(index + 1)..].iter() {
                 let pair: Pair = (box_1, box_2);
                 let distance = calculate_distance(&pair);
                 vector.push(PairDistance { pair, distance });
