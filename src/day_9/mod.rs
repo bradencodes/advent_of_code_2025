@@ -107,6 +107,10 @@ pub mod part_1 {
         largest_area
     }
 
+    pub fn solve(input: &str) -> i64 {
+        find_largest_area_from_raw_input(input)
+    }
+
     #[cfg(test)]
     mod tests {
         use super::*;
