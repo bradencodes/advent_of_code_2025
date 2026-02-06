@@ -8,7 +8,19 @@ pub mod part_1 {
 
     /// Turn each line into a coordinate point.
     fn parse_tiles(input: &str) -> RedTiles {
-        todo!()
+        input
+            .lines()
+            .map(|line| {
+                let mut parts = line
+                    .split(",")
+                    .map(|coordinate_str| coordinate_str.parse::<Coordinate>().unwrap());
+                let x_coordinate = parts.next().unwrap();
+                let y_coordinate = parts.next().unwrap();
+                let red_tile = (x_coordinate, y_coordinate);
+
+                red_tile
+            })
+            .collect()
     }
 
     /// Find the [convex hull](https://www.geeksforgeeks.org/dsa/convex-hull-using-graham-scan/) of the red tile points.
@@ -36,6 +48,13 @@ pub mod part_1 {
         fn find_largest_area_works() {
             let input = include_str!("./test_input.txt");
             assert_eq!(find_largest_area_from_raw_input(input), 50);
+        }
+
+        #[test]
+        fn parse_tiles_works() {
+            let input = "1,2\n3,4\n56,78\n9,10\n";
+            let red_tiles = vec![(1, 2), (3, 4), (56, 78), (9, 10)];
+            assert_eq!(parse_tiles(input), red_tiles);
         }
     }
 }
