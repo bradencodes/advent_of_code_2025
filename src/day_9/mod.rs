@@ -162,13 +162,14 @@ pub mod part_2 {
     fn find_largest_complete_area(input: &str) -> u64 {
         let largest_complete_area = 0;
 
-        // Iterate through all pairs of red tiles
-        // Check that there are only colored tiles in the created area. We'll
-        // call this a complete area.
-            // Do this by seeing if there are any red tiles inside the area and
-            // not on the edge.
-        // If the area is complete and larger than the largest found area, set it to
-        // the largest found area.
+        // 1. Iterate through all pairs of red tiles
+            // 1. If the created area is not larger than the largest found, continue to
+            // the next pair.
+            // 2. Check that there are only colored tiles in the created area. We'll
+            // call this a complete area.
+                // WIP: Do this by seeing if there are any perpendicular edge intersections
+                // between the entire shape and the created area.
+            // 3. If the area is complete, set it to the largest found area.
 
         largest_complete_area
     }
