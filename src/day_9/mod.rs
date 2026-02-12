@@ -157,3 +157,30 @@ pub mod part_1 {
         }
     }
 }
+
+pub mod part_2 {
+    fn find_largest_complete_area(input: &str) -> u64 {
+        let largest_complete_area = 0;
+
+        // Iterate through all pairs of red tiles
+        // Check that there are only colored tiles in the created area. We'll
+        // call this a complete area.
+            // Do this by seeing if there are any red tiles inside the area and
+            // not on the edge.
+        // If the area is complete and larger than the largest found area, set it to
+        // the largest found area.
+
+        largest_complete_area
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+
+        #[test]
+        fn find_largest_complete_area_works() {
+            let input = include_str!("./test_input.txt");
+            assert_eq!(find_largest_complete_area(input), 24);
+        }
+    }
+}
